@@ -1,7 +1,7 @@
 from scipy import stats
 import pandas as pd
 import numpy as np
-from tqdm import *
+from tqdm import tqdm
 from chronoamperometry import utils
 
 
