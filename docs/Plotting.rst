@@ -2,8 +2,8 @@ Plotting
 ========
 .. automodule:: chronoamperometry.plotting
 
-Statistics for Replicate Data
------------------------------
+Plotting for Replicate Data
+---------------------------
 .. autoclass:: chronoamperometry.plotting.ReplicatePlot
     :members:
 
@@ -12,8 +12,8 @@ Statistics for Replicate Data
     .. automethod:: plot_replicates_greyscale
     .. automethod:: plot_replicates_lowess_regression_smoothing
 
-Statistics for Variable Testing
--------------------------------
+Plotting for Variable Testing
+-----------------------------
 
 .. autoclass:: chronoamperometry.plotting.VariablePlot
     :members:
@@ -21,8 +21,8 @@ Statistics for Variable Testing
 
     .. automethod:: plot_absolute_deviation_from_signal_per_channel
 
-Statistics for Experimental Validation
---------------------------------------
+Plotting for Experimental Validation
+------------------------------------
 
 .. autoclass:: chronoamperometry.plotting.ExperimentPlot
     :members:
