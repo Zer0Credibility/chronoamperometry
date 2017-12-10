@@ -8,6 +8,12 @@ setup(
     license='4-clause BSD',
     author='Clayton Rabideau',
     author_email='cmr57@cam.ac.uk',
-    description='A toolset for analyzing chronoamperometric data'
-
+    description='A toolset for analyzing chronoamperometric data',
+    install_requires=[
+                       'numpy',
+                       'pandas',
+                       'plotnine',
+                       'tqdm',
+                       'scipy',
+                   ]
 )
