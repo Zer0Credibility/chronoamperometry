@@ -2,7 +2,7 @@ from scipy import stats
 import pandas as pd
 import numpy as np
 from tqdm import *
-import utils
+from chronoamperometry import utils
 
 
 class Replicate_Statistics(object):
@@ -207,6 +207,12 @@ class Replicate_Statistics(object):
 
 class Variable_Statistics(object):
 
+    """
+    This class contains statistical tools for analysis of replicates over a multiple measurements involving one
+    variable.
+
+    """
+
     def __init__(self, data1, data2, span=0.2):
 
         if type(data1) == str and data1.lower().endswith('.xlsx'):
@@ -272,6 +278,11 @@ class Variable_Statistics(object):
 
 
 class Experimental_Statistics(object):
+
+    """
+    This class contains a tool for running a t-test. Will eventually have more tests.
+
+    """
 
     def __init__(self, data1, data2):
 

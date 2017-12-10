@@ -1,6 +1,6 @@
 Statistics
-===================================
-.. automodule:: statistics
+==========
+.. automodule:: chronoamperometry.statistics
 
 Statistics for Replicate Data
 ----------------------------------
@@ -13,7 +13,7 @@ Statistics for Replicate Data
     .. automethod:: anova_test
 
 Statistics for Variable Testing
-----------------------------------
+-------------------------------
 
 .. autoclass:: chronoamperometry.statistics.Variable_Statistics
     :members:
@@ -21,7 +21,7 @@ Statistics for Variable Testing
     .. automethod:: compare_absolute_deviation_from_signal_between_experiments
 
 Statistics for Experimental Validation
-----------------------------------
+--------------------------------------
 
 .. autoclass:: chronoamperometry.statistics.Experimental_Statistics
     :members:

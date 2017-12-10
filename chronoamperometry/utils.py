@@ -4,10 +4,22 @@ import numpy as np
 
 class DataFrameBuild(object):
 
+    """
+    This class consumes excel file outputs from PalmSens Multitrace and converts them to a standardized
+    pandas dataframe format
+
+    """
+
     def __init__(self, mt_excel_data):
         self.excel_data = str(mt_excel_data)
 
     def dataframe_from_mtxl(self):
+
+        """
+        Consumes excel files and produces unmelted dataframes where each column is a different channel, except the first,
+        which is time.
+
+        """
 
         df = pd.read_excel(self.excel_data, encoding='utf8', skiprows=range(1, 2))
 
@@ -33,6 +45,11 @@ class DataFrameBuild(object):
         return df, ch_names
 
     def melted_dataframe_from_mtxl(self):
+
+        """
+        Consumes excel files and produces melted dataframes, grammar of graphics style.
+
+        """
 
         df = pd.read_excel(self.excel_data, encoding='utf8', skiprows=range(1, 2))
 

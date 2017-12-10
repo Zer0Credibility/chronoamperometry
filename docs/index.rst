@@ -4,11 +4,14 @@
    contain the root `toctree` directive.
 
 Welcome to the documentation for Chronoamperometry!
-=============================================
+===================================================
 
 .. toctree::
    :maxdepth: 1
-   :caption: Overview
+   :caption: Getting Started
+
+   Overview
+   Example Usage
 
 
 .. toctree::

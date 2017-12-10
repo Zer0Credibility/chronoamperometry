@@ -1,11 +1,16 @@
 # encoding: utf-8
-from plotnine import *
-import utils
-import statistics
+import plotnine
+from chronoamperometry import utils, statistics
 import pandas as pd
+import matplotlib
+matplotlib.use('TkAgg')
 
 
 class ReplicatePlot(object):
+    """
+    Is designed to plot replicates from a single experiment.
+
+    """
 
     def __init__(self, data, span=0.2):
         if type(data) == str and data.lower().endswith('.xlsx'):
@@ -20,6 +25,11 @@ class ReplicatePlot(object):
             self.span = span
 
     def plot_replicates(self):
+
+        """
+        Plots replicate traces from a single run. Color is assigned randomly.
+
+        """
 
         from plotnine import ggplot, ylab, xlab, geom_line, aes, stat_smooth, geom_smooth
 
@@ -37,6 +47,14 @@ class ReplicatePlot(object):
 
     def plot_replicates_log_axes(self):
 
+        """
+        Plots replicate traces from a single run on logarithmic axes to determine the baseline metabolic charge production
+        or other stabilization.
+
+        """
+
+        from plotnine import ggplot, ylab, xlab, geom_line, aes, scale_y_log10, scale_x_log10
+
         plot = (
 
             (ggplot(self.data, aes('Time', 'Current', color='Channel'))
@@ -53,6 +71,13 @@ class ReplicatePlot(object):
 
     def plot_replicates_greyscale(self):
 
+        """
+        Some journals require greyscale graphs. This method makes that simple.
+
+        """
+
+        from plotnine import ggplot, ylab, xlab, geom_line, aes, theme_bw, scale_color_grey
+
         plot = (
 
             (ggplot(self.data, aes('Time', 'Current', color='Channel'))
@@ -68,6 +93,13 @@ class ReplicatePlot(object):
         return plot
 
     def plot_replicates_lowess_regression_smoothing(self):
+
+        """
+        Applies a lowess smoothing regression to replicates plot in order to estimate the true function.
+
+        """
+
+        from plotnine import ggplot, ylab, xlab, geom_line, aes, geom_smooth, theme_bw, scale_color_grey
 
         plot = (
 
@@ -86,6 +118,10 @@ class ReplicatePlot(object):
 
 
 class VariablePlot(object):
+    """
+    Plots the variation from the true function on a per-channel basis... will add more functions later.
+
+    """
 
     def __init__(self, data):
         if type(data) == str and data.lower().endswith('.xlsx'):
@@ -100,24 +136,14 @@ class VariablePlot(object):
         else:
             pass
 
-    def plot_median_absolute_deviation_from_signal(self):
-
-        if self.data.internal_cache == 'MADS':
-            ads = self.data
-        elif self.data.internal_cache == 'melted':
-            ads = statistics.Replicate_Statistics(self.data).calculate_median_absolute_deviation_from_signal()
-
-        plot = (
-
-            (ggplot(ads, aes('Experiment', 'Deviation'))
-             + stat_boxplot())
-
-        )
-
-        print (plot)
-        return plot
-
     def plot_absolute_deviation_from_signal_per_channel(self):
+        """
+        Boxplots of the distance of the raw noisy data from the lowess smoothing function
+        for each channel. The lowess regression is taken to be an esimation of the true function.
+
+        """
+
+        from plotnine import ggplot, aes, stat_boxplot
 
         if self.data.internal_cache == 'P/C_MADS':
             dev_df = self.data
@@ -136,6 +162,10 @@ class VariablePlot(object):
 
 
 class ExperimentPlot(object):
+    """
+    Plots comparisons between experiments.
+
+    """
 
     def __init__(self, data1, data2):
         self.data1 = data1
@@ -143,6 +173,11 @@ class ExperimentPlot(object):
         self.t_test_df = statistics.Experimental_Statistics(data1, data2).t_test()
 
     def plot_t_test(self):
+        """
+        Plots p-value vs time
+
+        """
+        from plotnine import ggplot, aes, ylab, xlab, geom_line
         df = self.t_test_df
 
         plot = (
@@ -158,6 +193,11 @@ class ExperimentPlot(object):
         return plot
 
     def plot_means_after_t_test(self):
+        """
+        Plots means of the two experiments vs time
+
+        """
+        from plotnine import ggplot, aes, ylab, xlab, geom_line
         df = self.t_test_df
 
         plot = (
@@ -174,6 +214,11 @@ class ExperimentPlot(object):
         return plot
 
     def plot_standard_deviation_after_t_test(self):
+        """
+        Plots standard deviation of two experiments vs time.
+
+        """
+        from plotnine import ggplot, aes, ylab, xlab, geom_line
         df = self.t_test_df
 
         plot = (
@@ -183,6 +228,31 @@ class ExperimentPlot(object):
              + xlab('Time (seconds)')
              + geom_line()
              + geom_line(aes('Time', 'Standard Deviation 2')))
+
+        )
+
+        print (plot)
+        return plot
+
+    def plot_median_absolute_deviation_from_signal(self):
+        """
+        boxplot of median absolute deviation from the lowess regression for two experiments. Is an estimation of the
+        difference in magnitude of noise for each experiment. Broken in last update.
+
+        """
+
+
+        from plotnine import ggplot, aes, stat_boxplot
+
+        if self.data.internal_cache == 'MADS':
+            ads = self.data
+        elif self.data.internal_cache == 'melted':
+            ads = statistics.Replicate_Statistics(self.data).calculate_median_absolute_deviation_from_signal()
+
+        plot = (
+
+            (ggplot(ads, aes('Experiment', 'Deviation'))
+             + stat_boxplot())
 
         )
 
