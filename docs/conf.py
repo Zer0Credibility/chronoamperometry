@@ -37,7 +37,9 @@ MOCK_MODULES = ['numpy',
                 'math',
                 '__future__',
                 'toolboxutilities',
-                'tqdm']
+                'tqdm',
+                'statsmodels.nonparametric.smoothers_lowess',
+                'scipy.stats']
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
