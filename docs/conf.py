@@ -39,6 +39,7 @@ MOCK_MODULES = ['numpy',
                 'toolboxutilities',
                 'tqdm',
                 'statsmodels.nonparametric.smoothers_lowess.lowess',
+                'statsmodels',
                 'scipy.stats']
 
 for mod_name in MOCK_MODULES:

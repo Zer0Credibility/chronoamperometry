@@ -15,5 +15,6 @@ setup(
                        'plotnine',
                        'tqdm',
                        'scipy',
-                   ]
+                       'statsmodels',
+                     ]
 )
