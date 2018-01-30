@@ -284,7 +284,9 @@ class Experimental_Statistics(object):
 
     """
 
-    def __init__(self, data1, data2):
+    def __init__(self, data1, data2, significance_threshold=0.05):
+
+        self.significance = significance_threshold
 
         if type(data1) == str and data1.lower().endswith('.xlsx'):
             self.data1 = utils.DataFrameBuild(data1).dataframe_from_mtxl()[0]
@@ -345,7 +347,7 @@ class Experimental_Statistics(object):
 
         df = pd.DataFrame(
             columns=['Time', 'Mean 1', 'Mean 2', 'Standard Deviation 1', 'Standard Deviation 2', 'T Statistic',
-                     'P Value'])
+                     'P Value', 'Significance'])
 
         print(df)
 
@@ -373,11 +375,13 @@ class Experimental_Statistics(object):
             # t_stat_list.append(t_stat)
             # p_value_list.append(p_value)
 
-            row = [point, mean1, mean2, std1, std2, t_stat, p_value]
+            significance = self.significance
 
-            dfi = pd.DataFrame([[point, mean1, mean2, std1, std2, t_stat, p_value]],
+            row = [point, mean1, mean2, std1, std2, t_stat, p_value, significance]
+
+            dfi = pd.DataFrame([[point, mean1, mean2, std1, std2, t_stat, p_value, significance]],
                                columns=['Time', 'Mean 1', 'Mean 2', 'Standard Deviation 1', 'Standard Deviation 2',
-                                        'T Statistic', 'P Value'])
+                                        'T Statistic', 'P Value', 'Significance'])
 
             # print(dfi)
 

@@ -3,6 +3,7 @@ import plotnine
 from chronoamperometry import utils, statistics
 import pandas as pd
 import matplotlib
+import numpy as np
 matplotlib.use('TkAgg')
 
 
@@ -15,8 +16,10 @@ class ReplicatePlot(object):
     def __init__(self, data, span=0.2):
         if type(data) == str and data.lower().endswith('.xlsx'):
             self.data = utils.DataFrameBuild(data).melted_dataframe_from_mtxl()[0]
+            self.span = span
         elif data.internal_cache == 'melted':
             self.data = data
+            self.span = span
         elif data.internal_cache == 'unmelted':
             ch_names = data.Channel.unique().tolist()
             df = pd.melt(data, id_vars=['Time'], value_vars=ch_names, var_name='Channel', value_name='Current')
@@ -171,13 +174,14 @@ class ExperimentPlot(object):
         self.data1 = data1
         self.data2 = data2
         self.t_test_df = statistics.Experimental_Statistics(data1, data2).t_test()
+        self.significance = len(self.t_test_df.index)
 
     def plot_t_test(self):
         """
         Plots p-value vs time
 
         """
-        from plotnine import ggplot, aes, ylab, xlab, geom_line
+        from plotnine import ggplot, aes, ylab, xlab, geom_line, scale_y_continuous
         df = self.t_test_df
 
         plot = (
@@ -185,7 +189,9 @@ class ExperimentPlot(object):
             (ggplot(df, aes('Time', 'P Value'))
              + ylab('P Value')
              + xlab('Time (seconds)')
-             + geom_line())
+             + geom_line()
+             + scale_y_continuous(breaks=np.linspace(0, 1, 21))
+             + geom_line(aes('Time', 'Significance'), color='red'))
 
         )
 

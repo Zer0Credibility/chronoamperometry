@@ -28,3 +28,4 @@ Several of these have sub-dependencies:
 3. plotnine
 4. scipy
 5. tqdm
+6. xlrd
