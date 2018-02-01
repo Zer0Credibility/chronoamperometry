@@ -14,18 +14,16 @@ class ReplicatePlot(object):
     """
 
     def __init__(self, data, span=0.2):
+        self.span = span
         if type(data) == str and data.lower().endswith('.xlsx'):
             self.data = utils.DataFrameBuild(data).melted_dataframe_from_mtxl()[0]
-            self.span = span
         elif data.internal_cache == 'melted':
             self.data = data
-            self.span = span
         elif data.internal_cache == 'unmelted':
             ch_names = data.Channel.unique().tolist()
             df = pd.melt(data, id_vars=['Time'], value_vars=ch_names, var_name='Channel', value_name='Current')
             df.internal_cache = 'melted'
             self.data = df
-            self.span = span
 
     def plot_replicates(self):
 
@@ -110,8 +108,6 @@ class ReplicatePlot(object):
              + ylab(u'Current (μA)')
              + xlab('Time (seconds)')
              + geom_line()
-             + theme_bw()
-             + scale_color_grey()
              + geom_smooth(span=self.span, method='lowess'))
 
         )
@@ -119,30 +115,11 @@ class ReplicatePlot(object):
         print (plot)
         return plot
 
-
-class VariablePlot(object):
-    """
-    Plots the variation from the true function on a per-channel basis... will add more functions later.
-
-    """
-
-    def __init__(self, data):
-        if type(data) == str and data.lower().endswith('.xlsx'):
-            self.data = utils.DataFrameBuild(data).melted_dataframe_from_mtxl()[0]
-        elif data.internal_cache == 'melted':
-            self.data = data
-        elif data.internal_cache == 'unmelted':
-            ch_names = data.Channel.unique().tolist()
-            df = pd.melt(data, id_vars=['Time'], value_vars=ch_names, var_name='Channel', value_name='Current')
-            df.internal_cache = 'melted'
-            self.data = df
-        else:
-            pass
-
-    def plot_absolute_deviation_from_signal_per_channel(self):
+    def plot_replicates_noise(self):
         """
         Boxplots of the distance of the raw noisy data from the lowess smoothing function
         for each channel. The lowess regression is taken to be an esimation of the true function.
+        Uses Absolute Median Deviation from the regression function.
 
         """
 
@@ -151,7 +128,7 @@ class VariablePlot(object):
         if self.data.internal_cache == 'P/C_MADS':
             dev_df = self.data
         elif self.data.internal_cache == 'melted':
-            dev_df = statistics.Replicate_Statistics(self.data).calculate_absolute_deviation_from_signal_per_channel()
+            dev_df = statistics.ReplicateStatistics(self.data).calculate_absolute_deviation_from_signal_per_channel()
 
         plot = (
 
@@ -173,7 +150,8 @@ class ExperimentPlot(object):
     def __init__(self, data1, data2):
         self.data1 = data1
         self.data2 = data2
-        self.t_test_df = statistics.Experimental_Statistics(data1, data2).t_test()
+        self.t_test_df = statistics.ExperimentalStatistics(data1, data2).t_test()
+        self.anova_df = statistics.ExperimentalStatistics(data1, data2).anova_test()
         self.significance = len(self.t_test_df.index)
 
     def plot_t_test(self):
@@ -198,7 +176,7 @@ class ExperimentPlot(object):
         print (plot)
         return plot
 
-    def plot_means_after_t_test(self):
+    def plot_means(self):
         """
         Plots means of the two experiments vs time
 
@@ -219,7 +197,7 @@ class ExperimentPlot(object):
         print (plot)
         return plot
 
-    def plot_standard_deviation_after_t_test(self):
+    def plot_standard_deviations(self):
         """
         Plots standard deviation of two experiments vs time.
 
@@ -240,7 +218,7 @@ class ExperimentPlot(object):
         print (plot)
         return plot
 
-    def plot_median_absolute_deviation_from_signal(self):
+    def plot_comparative_noise(self):
         """
         boxplot of median absolute deviation from the lowess regression for two experiments. Is an estimation of the
         difference in magnitude of noise for each experiment. Broken in last update.
@@ -253,7 +231,7 @@ class ExperimentPlot(object):
         if self.data.internal_cache == 'MADS':
             ads = self.data
         elif self.data.internal_cache == 'melted':
-            ads = statistics.Replicate_Statistics(self.data).calculate_median_absolute_deviation_from_signal()
+            ads = statistics.ReplicateStatistics(self.data).calculate_median_absolute_deviation_from_signal()
 
         plot = (
 
@@ -264,4 +242,28 @@ class ExperimentPlot(object):
 
         print (plot)
         return plot
+
+    def plot_anova(self):
+        """
+        Plots variance vs time
+
+        """
+        from plotnine import ggplot, aes, ylab, xlab, geom_line
+        df = self.anova_df
+
+        plot = (
+
+            (ggplot(df, aes('Time', 'F-Value'))
+             + ylab('F-Value')
+             + xlab('Time (seconds)')
+             + geom_line()
+             + geom_line(aes('Time', 'P-Value'), color='red')
+
+             )
+
+        )
+
+        print (plot)
+        return plot
+
 

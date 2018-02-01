@@ -5,7 +5,7 @@ from tqdm import tqdm
 from chronoamperometry import utils
 
 
-class Replicate_Statistics(object):
+class ReplicateStatistics(object):
 
     """ This class contains statistical tools for analysis of replicates over a single run """
 
@@ -159,7 +159,7 @@ class Replicate_Statistics(object):
 
         return df
 
-    def anova_test(self):
+    def anova_test_magnitude_of_current_variance(self):
         """
         Not Working Yet
         :return:
@@ -200,93 +200,21 @@ class Replicate_Statistics(object):
         print('One-Way ANOVA F =', f_val)
 
         # print (ch_list)
-        exit()
 
         return anova
 
 
-class Variable_Statistics(object):
-
-    """
-    This class contains statistical tools for analysis of replicates over a multiple measurements involving one
-    variable.
-
-    """
-
-    def __init__(self, data1, data2, span=0.2):
-
-        if type(data1) == str and data1.lower().endswith('.xlsx'):
-            self.dataframe1 = utils.DataFrameBuild(data1).melted_dataframe_from_mtxl()[0]
-            self.channels1 = utils.DataFrameBuild(data1).melted_dataframe_from_mtxl()[1]
-        elif data1.internal_cache == 'melted':
-            self.dataframe1 = data1
-            self.channels1 = data1.Channel.unique().tolist()
-        elif data1.internal_cache == 'unmelted':
-            ch_names = data1.Channel.unique().tolist()
-            df = pd.melt(data1, id_vars=['Time'], value_vars=ch_names, var_name='Channel', value_name='Current')
-            df.internal_cache = 'melted'
-            self.dataframe1 = df
-            self.channels1 = ch_names
-
-        if type(data2) == str and data2.lower().endswith('.xlsx'):
-            self.dataframe2 = utils.DataFrameBuild(data2).melted_dataframe_from_mtxl()[0]
-            self.channels2 = utils.DataFrameBuild(data2).melted_dataframe_from_mtxl()[1]
-        elif data2.internal_cache == 'melted':
-            self.dataframe2 = data2
-            self.channels2 = data2.Channel.unique().tolist()
-        elif data2.internal_cache == 'unmelted':
-            ch_names = data2.Channel.unique().tolist()
-            df = pd.melt(data2, id_vars=['Time'], value_vars=ch_names, var_name='Channel', value_name='Current')
-            df.internal_cache = 'melted'
-            self.dataframe2 = df
-            self.channels2 = ch_names
-
-        self.span = span
-
-    def compare_absolute_deviation_from_signal_between_experiments(self):
-        '''
-        Allows for a comparison of noise between two experiments with a single variable
-        '''
-
-        span = self.span
-        df1 = self.dataframe1
-        df2 = self.dataframe2
-
-        if df1.internal_cache == 'melted':
-            pass
-        else:
-            raise Exception('lowess regression on first dataframe requires a melted dataframe!')
-
-        if df2.internal_cache == 'melted':
-            pass
-        else:
-            raise Exception('lowess regression on second dataframe requires a melted dataframe!')
-
-        df1 = Replicate_Statistics(df1, span).construct_lowess_regression()
-        df2 = Replicate_Statistics(df2, span).construct_lowess_regression()
-
-        ads_df1 = Replicate_Statistics(df1).calculate_median_absolute_deviation_from_signal()
-        ads_df2 = Replicate_Statistics(df2).calculate_median_absolute_deviation_from_signal()
-
-        all_df = ads_df1.append(ads_df2)
-
-        all_df.internal_cache = 'ads_ex'
-        ads_df1.internal_cache = 'ads_ex'
-        ads_df2.internal_cache = 'ads_ex'
-
-        return ads_df1, ads_df2
-
-
-class Experimental_Statistics(object):
+class ExperimentalStatistics(object):
 
     """
     This class contains a tool for running a t-test. Will eventually have more tests.
 
     """
 
-    def __init__(self, data1, data2, significance_threshold=0.05):
+    def __init__(self, data1, data2, span=0.2, significance_threshold=0.05):
 
         self.significance = significance_threshold
+        self.span = span
 
         if type(data1) == str and data1.lower().endswith('.xlsx'):
             self.data1 = utils.DataFrameBuild(data1).dataframe_from_mtxl()[0]
@@ -309,6 +237,29 @@ class Experimental_Statistics(object):
             self.data2 = df
         else:
             pass
+
+    def compare_absolute_deviation_from_signal_between_experiments(self):
+        '''
+        Allows for a comparison of noise between two experiments with a single variable
+        '''
+
+        span = self.span
+        df1 = self.data1
+        df2 = self.data2
+
+        df1 = ReplicateStatistics(df1, span).construct_lowess_regression()
+        df2 = ReplicateStatistics(df2, span).construct_lowess_regression()
+
+        ads_df1 = ReplicateStatistics(df1).calculate_median_absolute_deviation_from_signal()
+        ads_df2 = ReplicateStatistics(df2).calculate_median_absolute_deviation_from_signal()
+
+        all_df = ads_df1.append(ads_df2)
+
+        all_df.internal_cache = 'ads_ex'
+        ads_df1.internal_cache = 'ads_ex'
+        ads_df2.internal_cache = 'ads_ex'
+
+        return ads_df1, ads_df2
 
     def t_test(self):
         '''
@@ -392,3 +343,69 @@ class Experimental_Statistics(object):
         # print(df)
 
         return df
+
+    def anova_test(self):
+        """
+        returns an an analysis of variance comparing distribution of current magnitude between
+         two experiments at each timepoint.
+        """
+
+        import pandas as pd
+        import numpy as np
+        import scipy as sp
+        import utils
+
+        print('Running Analysis of Variance...')
+
+        df1 = self.data1
+        df2 = self.data2
+
+        df_current1 = df1.ix[:, 1:]
+        df_current2 = df2.ix[:, 1:]
+
+        len1 = len(df_current1.index)
+        len2 = len(df_current2.index)
+
+        if len1 < len2:
+            time_length = len1
+            time = np.array(df1.ix[:, 0].values.tolist())
+        else:
+            time_length = len2
+            time = np.array(df2.ix[:, 0].values.tolist())
+
+        # mean1_list = []
+        # mean2_list = []
+
+        # standard_deviation_list1 = []
+        # standard_deviation_list2 = []
+
+        # t_stat_list = []
+        # p_value_list = []
+
+        df = pd.DataFrame(columns=['Time', 'F-Value', 'P-Value'])
+
+        # print(df)
+
+        for i in tqdm(range(0, time_length)):
+            point = time[i]
+
+            currents1 = df_current1.ix[i].values.tolist()
+            currents2 = df_current2.ix[i].values.tolist()
+
+            currents1 = np.array(currents1)
+            currents2 = np.array(currents2)
+
+            f_val, p_val = stats.f_oneway(currents1, currents2)
+
+            dfi = pd.DataFrame([[point, f_val, p_val]], columns=['Time', 'F-Value', 'P-Value'])
+
+            # print(dfi)
+
+            df = df.append(dfi, ignore_index=True)
+
+        df.internal_cache = 'anova_test'
+
+        # print(df)
+
+        return df
+
