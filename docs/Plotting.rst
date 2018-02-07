@@ -8,16 +8,6 @@ Plotting for Replicate Data
     :members:
 
 
-
-Plotting for Variable Testing
------------------------------
-
-.. autoclass:: chronoamperometry.plotting.VariablePlot
-    :members:
-
-
-
-
 Plotting for Experimental Validation
 ------------------------------------
 

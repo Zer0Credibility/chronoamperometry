@@ -7,9 +7,9 @@ from chronoamperometry import utils
 
 class ReplicateStatistics(object):
 
-    """ This class contains statistical tools for analysis of replicates over a single run """
+    """ This class contains statistical tools for the analysis of replicate traces """
 
-    def __init__(self, data, span=0.2, df_name='mads_df'):
+    def __init__(self, data, span=0.2, df_name='mads_df', periodicity=None, cycles=None, stabilization_time=None):
         if type(data) == str and data.lower().endswith('.xlsx'):
             self.dataframe = utils.DataFrameBuild(data).melted_dataframe_from_mtxl()[0]
             self.channels = utils.DataFrameBuild(data).melted_dataframe_from_mtxl()[1]
@@ -24,6 +24,9 @@ class ReplicateStatistics(object):
             self.channels = ch_names
         self.span = span
         self.df_name = df_name
+        self.periodicity = periodicity
+        self.stabilization = stabilization_time
+        self.cycles = cycles
 
     def construct_lowess_regression(self):
         '''
@@ -161,9 +164,30 @@ class ReplicateStatistics(object):
 
     def anova_test_magnitude_of_current_variance(self):
         """
+
+        Anova
+
         Not Working Yet
         :return:
         """
+        if self.stabilization is None:
+            print('You need to specify the stabilization time: the amount of time that passed before '
+                  'initiation of periodic peturbment of fuel cell')
+            exit(code=10)
+        else:
+            pass
+
+        if self.periodicity is None:
+            print('You need to specify the periodic cycle length.')
+            exit(code=11)
+        else:
+            pass
+
+        if self.cycles is None:
+            print('You need to specify the number of cycles.')
+            exit(code=12)
+        else:
+            pass
 
         df = self.dataframe
         channels = self.channels
@@ -207,7 +231,7 @@ class ReplicateStatistics(object):
 class ExperimentalStatistics(object):
 
     """
-    This class contains a tool for running a t-test. Will eventually have more tests.
+    This class contains tools for the analysis of a single variable between two groups of replicate traces.
 
     """
 

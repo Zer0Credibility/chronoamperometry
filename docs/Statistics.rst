@@ -4,22 +4,13 @@ Statistics
 
 Statistics for Replicate Data
 ----------------------------------
-.. autoclass:: chronoamperometry.statistics.Replicate_Statistics
+.. autoclass:: chronoamperometry.statistics.ReplicateStatistics
     :members:
-
-
-
-Statistics for Variable Testing
--------------------------------
-
-.. autoclass:: chronoamperometry.statistics.Variable_Statistics
-    :members:
-
 
 
 Statistics for Experimental Validation
 --------------------------------------
 
-.. autoclass:: chronoamperometry.statistics.Experimental_Statistics
+.. autoclass:: chronoamperometry.statistics.ExperimentalStatistics
     :members:
 
