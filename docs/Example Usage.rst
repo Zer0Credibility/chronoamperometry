@@ -17,7 +17,7 @@ Noise Esimation (Absolute median deviation from signal):
     data = '<path to dataset>'
 
     # Calculate the noise in the system
-    noise = statistics.Replicate_Statistics(data).calculate_median_absolute_deviation_from_signal()
+    noise = statistics.ReplicateStatistics(data).calculate_median_absolute_deviation_from_signal()
 
     print (noise)
 
@@ -34,7 +34,7 @@ T-test on two independent measurements:
     data2 = '<path to data for second variable>'
 
     # loading data into t-test
-    t_test = statistics.Experimental_Statistics(data1, data2).t_test()
+    t_test = statistics.ExperimentalStatistics(data1, data2).t_test()
 
     print(t_test)
 
