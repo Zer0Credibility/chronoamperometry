@@ -84,7 +84,7 @@ author = u'Clayton Rabideau'
 # built documents.
 #
 # The short X.Y version.
-version = u'0.1.0-a3'
+version = u'0.1.0-a4'
 # The full version, including alpha/beta/rc tags.
 release = u'1'
 

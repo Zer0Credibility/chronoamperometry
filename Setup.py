@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='chronoamperometry',
-    version='0.1.0a3',
+    version='0.1.0a4',
     packages=['chronoamperometry'],
     url='https://github.com/Zer0Credibility/chronoamperometry',
     license='4-clause BSD',

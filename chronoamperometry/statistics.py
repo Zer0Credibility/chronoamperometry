@@ -82,7 +82,7 @@ class ReplicateStatistics(object):
         elif df.internal_cache == 'melted':
             print ('median absolute deviation from signal calculation requires regression fitting first!')
             print ('running regression fitting analysis...')
-            df = Replicate_Statistics(df).construct_lowess_regression()
+            df = ReplicateStatistics(df).construct_lowess_regression()
 
         dfs = dict(list(df.groupby("Channel")))
 
@@ -133,7 +133,7 @@ class ReplicateStatistics(object):
         elif df.internal_cache == 'melted':
             print ('median absolute deviation from signal calculation requires regression fitting first!')
             print ('running regression fitting analysis...')
-            df = Replicate_Statistics(df).construct_lowess_regression()
+            df = ReplicateStatistics(df).construct_lowess_regression()
 
         dfs = dict(list(df.groupby("Channel")))
 
