@@ -53,3 +53,20 @@ Plot P-values vs time:
     plot = plotting.ExperimentPlot(data1, data2).plot_t_test()
 
 
+Split DataFrame into two Subsets:
+----------------------
+.. code-block:: python
+
+    from chronoamperometry import utils
+
+    # Point to location of Multi-Trace data
+    data = '<path to dataset>'
+
+    # Create lists of channels to be placed in first and second subsets
+    variable1 = [1, 2, 3, 4, 5, 6]
+    variable2 = [7, 8, 9, 10, 11, 12]
+
+    # Split data
+    subset1_df, subset2_df = utils.SelectData(data, subset_1=variable1, subset_2=variable2).split_dataframes()
+
+
