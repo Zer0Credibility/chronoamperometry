@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from time import sleep
+import six
 
 
 class DataFrameBuild(object):
@@ -31,7 +32,11 @@ class DataFrameBuild(object):
         data = headers[1::2]
 
         ch_names = [s.encode('ascii') for s in times]
-        ch_names = [x.strip(' ') for x in ch_names]
+
+        if six.PY2:
+            ch_names = [x.strip(' ') for x in ch_names]
+        else:
+            ch_names = [x.strip(' '.encode()) for x in ch_names]
 
         df = df.drop(bad_times, axis=1)
 
@@ -61,7 +66,11 @@ class DataFrameBuild(object):
         data = headers[1::2]
 
         ch_names = [s.encode('ascii') for s in times]
-        ch_names = [x.strip(' ') for x in ch_names]
+
+        if six.PY2:
+            ch_names = [x.strip(' ') for x in ch_names]
+        else:
+            ch_names = [x.strip(' '.encode()) for x in ch_names]
 
         # print(ch_names)
 
@@ -169,6 +178,9 @@ class SelectData(object):
         df_var1 = pd.concat(df_var1).reset_index(drop=True)
         df_var2 = pd.concat(df_var2).reset_index(drop=True)
 
+        df_var1.internal_cache = 'melted'
+        df_var2.internal_cache = 'melted'
+
         return df_var1, df_var2
 
     def delete_subset(self):
@@ -203,6 +215,8 @@ class SelectData(object):
                     pass
 
         df_var1 = pd.concat(df_var1).reset_index(drop=True)
+
+        df_var1.internal_cache = 'melted'
 
         return df_var1
 

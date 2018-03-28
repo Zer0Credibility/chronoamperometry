@@ -293,7 +293,6 @@ class ExperimentalStatistics(object):
         import pandas as pd
         import numpy as np
         import scipy as sp
-        import utils
 
         df1 = self.data1
         df2 = self.data2
@@ -371,13 +370,12 @@ class ExperimentalStatistics(object):
     def anova_test(self):
         """
         returns an an analysis of variance comparing distribution of current magnitude between
-         two experiments at each timepoint.
+        two experiments at each timepoint.
         """
 
         import pandas as pd
         import numpy as np
         import scipy as sp
-        import utils
 
         print('Running Analysis of Variance...')
 

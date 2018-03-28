@@ -4,7 +4,7 @@ from chronoamperometry import utils, statistics
 import pandas as pd
 import matplotlib
 import numpy as np
-matplotlib.use('TkAgg')
+matplotlib.rcParams["backend"] = 'macosx'
 
 
 class ReplicatePlot(object):
@@ -150,9 +150,68 @@ class ExperimentPlot(object):
     def __init__(self, data1, data2):
         self.data1 = data1
         self.data2 = data2
+
+        if type(data1) == str and data1.lower().endswith('.xlsx'):
+            self.data1df = utils.DataFrameBuild(data1).melted_dataframe_from_mtxl()[0]
+        elif data1.internal_cache == 'melted':
+            self.data1df = data1
+        elif data1.internal_cache == 'unmelted':
+            ch_names = data1.Channel.unique().tolist()
+            df = pd.melt(data1, id_vars=['Time'], value_vars=ch_names, var_name='Channel', value_name='Current')
+            df.internal_cache = 'melted'
+            self.data1df = df
+
+        if type(data2) == str and data2.lower().endswith('.xlsx'):
+            self.data2df = utils.DataFrameBuild(data2).melted_dataframe_from_mtxl()[0]
+        elif data2.internal_cache == 'melted':
+            self.data2df = data2
+        elif data2.internal_cache == 'unmelted':
+            ch_names = data2.Channel.unique().tolist()
+            df = pd.melt(data2, id_vars=['Time'], value_vars=ch_names, var_name='Channel', value_name='Current')
+            df.internal_cache = 'melted'
+            self.data2df = df
+
         self.t_test_df = statistics.ExperimentalStatistics(data1, data2).t_test()
         self.anova_df = statistics.ExperimentalStatistics(data1, data2).anova_test()
         self.significance = len(self.t_test_df.index)
+
+    def plot_replicate_groups(self):
+        from plotnine import ggplot, aes, ylab, xlab, geom_line, scale_y_continuous, geom_col, geom_point
+        df1 = self.data1df
+        df2 = self.data2df
+
+        df1.insert(0, 'Experiment', '1')
+        df2.insert(0, 'Experiment', '2')
+
+        #len1 = len(df1.index)
+        #len2 = len(df2.index)
+
+        #print len1-len2
+        #exit()
+
+        #if len1 > len2:
+        #    df1 = df1.drop(df1.tail(len1 - len2).index, inplace=True)
+        #else:
+        #    df2 = df2.drop(df2.tail(len2 - len1).index, inplace=True)
+
+        # df = pd.concat([df1, df2])
+
+        print(df1)
+        print(df2)
+
+        plot = (
+
+            (ggplot()
+                + ylab(u'Current (μA)')
+                + xlab('Time (seconds)')
+                + geom_line(df1, aes('Time', 'Current', color='Channel'))
+                + geom_line(df2, aes('Time', 'Current', color='Channel')))
+
+        )
+
+
+        print(plot)
+        return plot
 
     def plot_t_test(self):
         """
@@ -168,7 +227,7 @@ class ExperimentPlot(object):
              + ylab('P Value')
              + xlab('Time (seconds)')
              + geom_line()
-             + scale_y_continuous(breaks=np.linspace(0, 1, 21))
+             + scale_y_continuous(breaks=np.linspace(0, 0.0000005, 21))
              + geom_line(aes('Time', 'Significance'), color='red'))
 
         )
@@ -245,7 +304,7 @@ class ExperimentPlot(object):
 
     def plot_anova(self):
         """
-        Plots variance vs time
+        Plots F-value and P-value vs time
 
         """
         from plotnine import ggplot, aes, ylab, xlab, geom_line
